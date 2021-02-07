@@ -30,15 +30,43 @@ function nuevoProyecto(e) {
 }
 
 function guardarProyectoDB(nombreProyecto) {
-    // Inyectar el html
-    let nuevoProyecto = document.createElement('li');
+    // enviar datos
+    let datos = new FormData();
+    datos.append('proyecto', nombreProyecto);
+    datos.append('accion', 'crear');
 
-    nuevoProyecto.innerHTML = ` 
-    
-    <a href="#" >${nombreProyecto}</a>
-    
-    `;
+    // Crear llamado
+    let xhr = new XMLHttpRequest();
 
-    listaProyectos.appendChild(nuevoProyecto);
+    // abrir conexion
+    xhr.open('POST', 'inc/modelos/modelo-proyecto.php', true);
 
+    // retorno de datos
+    xhr.onload = function() {
+        if(this.status === 200) {
+            let respuesta = JSON.parse(xhr.responseText);
+            console.log(respuesta);
+
+            // si la respuesta es correcto
+            if(respuesta.respuesta === 'correcto') {
+                // nuevo proyecto
+                if(respuesta.tipo === 'crear') {
+                    swal({
+                        title: 'Proyecto Creado',
+                        text: 'El proyecto se creo correctamente',
+                        type: 'success'
+                    })
+                }
+            } else {
+                swal({
+                    title: 'El proyecto no se pudo crear',
+                    text: 'Hubo un error con el proyecto',
+                    type: 'error'
+                });
+            }
+        }
+    }
+
+    // enviar el request
+    xhr.send(datos);
 }
